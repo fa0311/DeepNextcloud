@@ -8,10 +8,10 @@ Works with CPU.
 
 ```.env
 # .env
-DEEPDANBOORU.URL="https://example.com"
-DEEPDANBOORU.USERNAME=""
-DEEPDANBOORU.PASSWORD=""
-DEEPDANBOORU.PATH="illustrations"
+DEEPNEXTCLOUD_URL="https://example.com" # NextCloud URL
+DEEPNEXTCLOUD_USERNAME="" # NextCloud Username
+DEEPNEXTCLOUD_PASSWORD="" # NextCloud Password
+DEEPNEXTCLOUD_PATH="illustrations" # NextCloud Path
 ```
 
 ```sh

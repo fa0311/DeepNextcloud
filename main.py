@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        env_prefix="DEEPDANBOORU.",
+        env_prefix="DEEPNEXTCLOUD_",
     )
     url: str = Field()
     username: str = Field()
@@ -221,7 +221,7 @@ if __name__ == "__main__":
     logger = getLogger(__name__)
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
-    logger.info("Starting DeepDanbooru")
+    logger.info("Starting DeepNextcloud")
 
     client = NextCloud(env.url, env.username, env.password)
     images = client.list(env.path)
