@@ -6,6 +6,8 @@ Works with CPU.
 <https://huggingface.co/skytnt/deepdanbooru_onnx>
 
 
+<https://twitter.com/faa0311/status/1794672340086964492>
+
 ```.env
 # .env
 DEEPNEXTCLOUD_URL="https://example.com" # NextCloud URL
