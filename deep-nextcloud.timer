@@ -1,0 +1,10 @@
+[Unit]
+Description=Runs Deep Nextcloud Sync every 5 minutes
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=5min
+Unit=deep-nextcloud.service
+
+[Install]
+WantedBy=timers.target
