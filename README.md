@@ -18,6 +18,8 @@ python -V
 ```
 
 ```sh
+# clone repository
+git clone --recurse-submodules https://github.com/fa0311/DeepNextcloud
 # install pytorch for CUDA 12.1
 # https://pytorch.org/get-started/locally/
 pip install torch torchvision torchaudio
@@ -29,9 +31,9 @@ pip install -r requirements.txt
 ```sh
 # Run
 python main.py
-# en: Remove all tags
+# Optional: remove all tag
 python remove_all_tag.py
-# use fa0311/twitter-snap
+# Optional: use fa0311/twitter-snap
 python twitter_snap_normalize.py
 ```
 
