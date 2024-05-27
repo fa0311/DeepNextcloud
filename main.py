@@ -1,4 +1,5 @@
 import logging
+import warnings
 import xml.etree.ElementTree as ET
 from logging import getLogger
 
@@ -9,7 +10,6 @@ import requests
 from huggingface_hub import hf_hub_download
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import warnings
 
 
 class Settings(BaseSettings):
@@ -188,7 +188,7 @@ class TagManager:
             if tag_name == name:
                 return tag_id
         raise Exception("Tag not found")
-    
+
     class ModelManager:
         def __init__(self, repo_id: str, filename: str, logger=None):
             self.repo_id = repo_id
@@ -196,19 +196,19 @@ class TagManager:
             self.tagger_model = None
             self.tagger_tags = None
             self.logger = logger or getLogger(__name__)
-        
+
         def load_model(self):
             if self.tagger_model is None:
                 self.logger.info("Loading model")
                 self.tagger_model, self.tagger_tags = DeepDanbooru.load_model(
-                    repo_id=self.repo_id,   
-                    filename=self.filename
+                    repo_id=self.repo_id,
+                    filename=self.filename,
                 )
                 self.logger.info("Model loaded")
             return self.tagger_model, self.tagger_tags
 
 
-def remove_all_tags():    
+def remove_all_tags():
     for _, _, id, _, tags in images:
         for tag_name in tags:
             tag_id = tag_manager.get_tag_id(tag_name, hidden=False)
@@ -216,7 +216,7 @@ def remove_all_tags():
 
 
 if __name__ == "__main__":
-    warnings.simplefilter('ignore')
+    warnings.simplefilter("ignore")
     env = Settings()
     logger = getLogger(__name__)
     logger.setLevel(logging.DEBUG)
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     model_manager = TagManager.ModelManager(
         repo_id="skytnt/deepdanbooru_onnx",
         filename="deepdanbooru.onnx",
-        logger=logger
+        logger=logger,
     )
 
     tag_manager = TagManager(client)
