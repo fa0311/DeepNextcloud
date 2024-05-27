@@ -15,14 +15,13 @@ DEEPNEXTCLOUD_PATH="illustrations" # NextCloud Path
 ```sh
 python -V
 # Python 3.10.12
-nvcc --version
-# Cuda compilation tools, release 11.8, V11.8.89
 ```
 
 ```sh
 # install pytorch for CUDA 12.1
 # https://pytorch.org/get-started/locally/
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install torch torchvision torchaudio
+# install other requirements
 pip install -r requirements.txt
 ```
 
