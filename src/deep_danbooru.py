@@ -3,7 +3,7 @@ import torch
 import tqdm
 from PIL import Image
 
-from src.deep_danbooru_model import DeepDanbooruModel
+from TorchDeepDanbooru.deep_danbooru_model import DeepDanbooruModel
 
 
 class DeepDanbooru:

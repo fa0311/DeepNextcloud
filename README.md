@@ -2,10 +2,6 @@
 
 NextCloud x DeepDanbooru
 
-Works with CPU.
-<https://huggingface.co/skytnt/deepdanbooru_onnx>
-
-
 <https://twitter.com/faa0311/status/1794672340086964492>
 
 ```.env
@@ -19,11 +15,25 @@ DEEPNEXTCLOUD_PATH="illustrations" # NextCloud Path
 ```sh
 python -V
 # Python 3.10.12
+nvcc --version
+# Cuda compilation tools, release 11.8, V11.8.89
 ```
 
 ```sh
+# install pytorch for CUDA 12.1
+# https://pytorch.org/get-started/locally/
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 pip install -r requirements.txt
+```
+
+
+```sh
+# Run
 python main.py
+# en: Remove all tags
+python remove_all_tag.py
+# use fa0311/twitter-snap
+python twitter_snap_normalize.py
 ```
 
 ```sh

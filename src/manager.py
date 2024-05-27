@@ -4,8 +4,8 @@ from logging import getLogger
 import torch
 
 from src.deep_danbooru import DeepDanbooru
-from src.deep_danbooru_model import DeepDanbooruModel
 from src.nextcloud import NextCloud
+from TorchDeepDanbooru.deep_danbooru_model import DeepDanbooruModel
 
 
 class TagManager:

@@ -3,7 +3,7 @@ Description=Deep Nextcloud Sync
 
 [Service]
 WorkingDirectory=/home/yuki/project/DeepNextcloud
-ExecStart=/home/yuki/project/DeepNextcloud/.venv/bin/python main.py
+ExecStart=/home/yuki/project/DeepNextcloud/.venv/bin/python twitter_snap_normalize.py
 ExecStartPre=/home/yuki/project/DeepNextcloud/.venv/bin/pip install -r /home/yuki/project/DeepNextcloud/requirements.txt
 
 [Install]
