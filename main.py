@@ -5,11 +5,14 @@ from logging import getLogger
 
 import cv2
 import numpy as np
-import onnxruntime as rt
 import requests
-from huggingface_hub import hf_hub_download
+import torch
+import tqdm
+from PIL import Image
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from deep_danbooru_model import DeepDanbooruModel
 
 
 class Settings(BaseSettings):
@@ -31,36 +34,31 @@ class Settings(BaseSettings):
 
 class DeepDanbooru:
     @staticmethod
-    def load_model(repo_id, filename):
-        model_path = hf_hub_download(repo_id=repo_id, filename=filename)
-        model = rt.InferenceSession(
-            model_path, providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
-        )
-        model_meta = model.get_modelmeta().custom_metadata_map
-        tags = eval(model_meta["tags"])
-        return model, tags
+    def load_model(filename):
+        model = DeepDanbooruModel()
+        model.load_state_dict(torch.load(filename))
+        model.eval()
+        model.half()
+        model.cuda()
 
     @staticmethod
-    def preprocess_image(image, size=512):
-        h, w = image.shape[:-1]
-        h, w = (size, int(size * w / h)) if h > w else (int(size * h / w), size)
-        ph, pw = size - h, size - w
-        image = cv2.resize(image, (w, h), interpolation=cv2.INTER_AREA)
-        image = cv2.copyMakeBorder(
-            image, ph // 2, ph - ph // 2, pw // 2, pw - pw // 2, cv2.BORDER_REPLICATE
-        )
-        image = image.astype(np.float32) / 255
-        return image[np.newaxis, :]
+    def preprocess_image(img: np.ndarray, size=512, pad_color=0):
+        w, h = img.size
+        ratio = min(size / w, size / h)
+        new_w, new_h = int(w * ratio), int(h * ratio)
+        resized_img = img.resize((new_w, new_h), Image.ANTIALIAS)
+        new_img = Image.new("RGB", (size, size), pad_color)
+        new_img.paste(resized_img, ((size - new_w) // 2, (size - new_h) // 2))
+        return new_img
 
     @staticmethod
-    def predict_and_parse(model, image, tags, score_threshold):
-        probs = model.run(None, {"input_1": image})[0][0]
-        probs = probs.astype(np.float32)
-        return [
-            label
-            for prob, label in zip(probs.tolist(), tags)
-            if prob >= score_threshold
-        ]
+    def predict_and_parse(model, img, score_threshold):
+        with torch.no_grad(), torch.autocast("cuda"):
+            x = torch.from_numpy(img).cuda()
+            y = model(x)[0].detach().cpu().numpy()
+            for n in tqdm.tqdm(range(10)):
+                model(x)
+        return [model.tags[i] for i, p in enumerate(y) if p >= score_threshold]
 
 
 class NextCloud:
