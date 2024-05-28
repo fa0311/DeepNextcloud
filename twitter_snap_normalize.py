@@ -20,7 +20,7 @@ def preprocess_image(image: cv2.typing.MatLike) -> list[cv2.typing.MatLike]:
     last_y = 0
 
     for y in range(height):
-        if np.all(image[y] == 255):
+        if np.mean(image[y]) > 250:
             if y - last_y > width // 2:
                 res.append(image[last_y + 1 : y - 1])
             last_y = y
