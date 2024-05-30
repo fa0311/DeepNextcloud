@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
         logger.info(f'Assigning tags "{tags}" and rating "{rating}"')
         tags.append(rating or "rating:safe")
-        for tag_name in tags + [rating]:
+        for tag_name in tags:
             tag_id = tag_manager.get_tag_id(tag_name, hidden=False)
             client.assign_tag(id, tag_id)
         client.assign_tag(id, invisible_tag_id)
