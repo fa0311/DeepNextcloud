@@ -13,7 +13,8 @@ from src.nextcloud import NextCloud
 
 
 def preprocess_image(image: cv2.typing.MatLike) -> list[cv2.typing.MatLike]:
-    margin = 42 + 1
+    scale = 2
+    margin = (42 * scale) + 1
     image = image[margin:-margin, margin:-margin]
     res = []
     height, width = image.shape[:2]
