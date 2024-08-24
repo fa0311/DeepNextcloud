@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     client = NextCloud(env.url, env.username, env.password)
 
-    images = client.list(env.path)
+    images = client.recursive_path_list(env.path)
     model_manager = ModelManager(
         url="https://github.com/AUTOMATIC1111/TorchDeepDanbooru/releases/download/v1/model-resnet_custom_v3.pt",
         filename="model-resnet_custom_v3.pt",
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     tag_manager = TagManager(client)
     invisible_tag_id = tag_manager.get_tag_id(env.invisible_tags, hidden=True)
 
-    for timestamp, content_type, id, image, tags in images:
+    for timestamp, content_type, id, image, displayname, tags in images:
         if content_type not in ["image/png", "image/jpeg", "video/mp4"]:
             continue
         if env.invisible_tags in tags:

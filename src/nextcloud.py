@@ -48,7 +48,7 @@ class NextCloud:
                 tuples.append(tuple(elem))
         return tuples
 
-    def list(self, path):
+    def path_list(self, path) -> list[tuple]:
         res = self.request(
             "PROPFIND",
             f"{self.url}/remote.php/dav/files/{self.username}/{path}",
@@ -57,10 +57,21 @@ class NextCloud:
                 "d:getcontenttype",
                 "oc:fileid",
                 "d:href",
+                "d:displayname",
                 "nc:system-tags",
             ],
         )
         return res
+
+    def recursive_path_list(self, path: str) -> list[tuple]:
+        children: list[tuple] = []
+        images = self.path_list(path)
+
+        for timestamp, content_type, id, image, displayname, tags in images[1:]:
+            if image.endswith("/"):
+                children.extend(self.recursive_path_list(f"{path}/{displayname}"))
+
+        return [*images[1:], *children]
 
     def download(self, id):
         response = self.session.request(

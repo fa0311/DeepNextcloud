@@ -18,9 +18,9 @@ if __name__ == "__main__":
 
     client = NextCloud(env.url, env.username, env.password)
 
-    images = client.list(env.path)
+    images = client.recursive_path_list(env.path)
     tag_manager = TagManager(client)
-    for _, _, id, _, tags in tqdm.tqdm(images):
+    for _, _, id, _, _, tags in tqdm.tqdm(images):
         for tag_name in tags:
             tag_id = tag_manager.get_tag_id(tag_name, hidden=False)
             client.unassign_tag(id, tag_id)

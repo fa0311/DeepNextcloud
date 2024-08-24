@@ -7,7 +7,6 @@ import numpy as np
 from PIL import Image
 
 from src.config import Settings
-from src.deep_danbooru import DeepDanbooru
 from src.manager import ModelManager, TagManager
 from src.nextcloud import NextCloud
 
@@ -38,6 +37,7 @@ if __name__ == "__main__":
 
     client = NextCloud(env.url, env.username, env.password)
 
+    images = client.recursive_path_list(env.path)
     model_manager = ModelManager(
         url="https://github.com/AUTOMATIC1111/TorchDeepDanbooru/releases/download/v1/model-resnet_custom_v3.pt",
         filename="model-resnet_custom_v3.pt",
@@ -48,12 +48,12 @@ if __name__ == "__main__":
     invisible_tag_id = tag_manager.get_tag_id(env.invisible_tags, hidden=True)
     rating_list = ["rating:safe", "rating:questionable", "rating:explicit"]
 
-    images = client.recursive_path_list(env.path)
+    filename = "1806971333621973454"
 
     for timestamp, content_type, id, image, displayname, tags in images:
         if content_type not in ["image/png", "image/jpeg", "video/mp4"]:
             continue
-        if env.invisible_tags in tags:
+        if not image.endswith(f"{filename}.png"):
             continue
         logger.info(f'Starting processing image "{image}"')
 
@@ -61,23 +61,10 @@ if __name__ == "__main__":
         model = model_manager.load_model()
 
         img = cv2.imdecode(np.frombuffer(content, np.uint8), cv2.IMREAD_COLOR)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         imgs = preprocess_image(img)
         tags = set()
         rating = rating_list[0]
-        for img in imgs:
-            img = DeepDanbooru.preprocess_image(Image.fromarray(img))
-            new_tags, new_rating = DeepDanbooru.predict_and_parse(
-                model=model,
-                img=img,
-                score_threshold=env.score_threshold,
-            )
-            tags.update(new_tags)
-            if new_rating and rating_list.index(new_rating) > rating_list.index(rating):
-                rating = new_rating
-
-        logger.info(f'Assigning tags "{tags}" and rating "{rating}"')
-        tags.add(rating)
-        for tag_name in tags:
-            tag_id = tag_manager.get_tag_id(tag_name, hidden=False)
-            client.assign_tag(id, tag_id)
-        client.assign_tag(id, invisible_tag_id)
+        for i, img in enumerate(imgs):
+            img_pil = Image.fromarray(img)
+            img_pil.save(f"{filename}-{i}.png")
