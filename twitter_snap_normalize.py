@@ -48,7 +48,8 @@ if __name__ == "__main__":
     invisible_tag_id = tag_manager.get_tag_id(env.invisible_tags, hidden=True)
     rating_list = ["rating:safe", "rating:questionable", "rating:explicit"]
 
-    images = client.recursive_path_list(env.path)
+    path_list_list = [client.recursive_path_list(x) for x in env.path.split(",")]
+    images = [item for sublist in path_list_list for item in sublist]
 
     for timestamp, content_type, id, image, displayname, tags in images:
         if content_type not in ["image/png", "image/jpeg", "video/mp4"]:

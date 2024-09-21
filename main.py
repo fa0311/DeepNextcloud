@@ -20,7 +20,8 @@ if __name__ == "__main__":
 
     client = NextCloud(env.url, env.username, env.password)
 
-    images = client.recursive_path_list(env.path)
+    path_list_list = [client.recursive_path_list(x) for x in env.path.split(",")]
+    images = [item for sublist in path_list_list for item in sublist]
     model_manager = ModelManager(
         url="https://github.com/AUTOMATIC1111/TorchDeepDanbooru/releases/download/v1/model-resnet_custom_v3.pt",
         filename="model-resnet_custom_v3.pt",
