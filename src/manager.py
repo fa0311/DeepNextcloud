@@ -27,7 +27,7 @@ class TagManager:
         for tag_id, tag_name in self.tags:
             if tag_name == name:
                 return tag_id
-        raise Exception("Tag not found")
+        raise Exception(f"Tag not found: {name}")
 
 
 class ModelManager:

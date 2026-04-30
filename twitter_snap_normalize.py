@@ -52,33 +52,36 @@ if __name__ == "__main__":
     images = [item for sublist in path_list_list for item in sublist]
 
     for timestamp, content_type, id, image, displayname, tags in images:
-        if content_type not in ["image/png", "image/jpeg", "video/mp4"]:
-            continue
-        if env.invisible_tags in tags:
-            continue
-        logger.info(f'Starting processing image "{image}"')
+        try:
+            if content_type not in ["image/png", "image/jpeg", "video/mp4"]:
+                continue
+            if env.invisible_tags in tags:
+                continue
+            logger.info(f'Starting processing image "{image}"')
 
-        content = client.download(id)
-        model = model_manager.load_model()
+            content = client.download(id)
+            model = model_manager.load_model()
 
-        img = cv2.imdecode(np.frombuffer(content, np.uint8), cv2.IMREAD_COLOR)
-        imgs = preprocess_image(img)
-        tags = set()
-        rating = rating_list[0]
-        for img in imgs:
-            img = DeepDanbooru.preprocess_image(Image.fromarray(img))
-            new_tags, new_rating = DeepDanbooru.predict_and_parse(
-                model=model,
-                img=img,
-                score_threshold=env.score_threshold,
-            )
-            tags.update(new_tags)
-            if new_rating and rating_list.index(new_rating) > rating_list.index(rating):
-                rating = new_rating
+            img = cv2.imdecode(np.frombuffer(content, np.uint8), cv2.IMREAD_COLOR)
+            imgs = preprocess_image(img)
+            tags = set()
+            rating = rating_list[0]
+            for img in imgs:
+                img = DeepDanbooru.preprocess_image(Image.fromarray(img))
+                new_tags, new_rating = DeepDanbooru.predict_and_parse(
+                    model=model,
+                    img=img,
+                    score_threshold=env.score_threshold,
+                )
+                tags.update(new_tags)
+                if new_rating and rating_list.index(new_rating) > rating_list.index(rating):
+                    rating = new_rating
 
-        logger.info(f'Assigning tags "{tags}" and rating "{rating}"')
-        tags.add(rating)
-        for tag_name in tags:
-            tag_id = tag_manager.get_tag_id(tag_name, hidden=False)
-            client.assign_tag(id, tag_id)
-        client.assign_tag(id, invisible_tag_id)
+            logger.info(f'Assigning tags "{tags}" and rating "{rating}"')
+            tags.add(rating)
+            for tag_name in tags:
+                tag_id = tag_manager.get_tag_id(tag_name, hidden=False)
+                client.assign_tag(id, tag_id)
+            client.assign_tag(id, invisible_tag_id)
+        except Exception as e:
+            logger.error(f'Error processing image "{image}": {e}')
