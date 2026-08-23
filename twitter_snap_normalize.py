@@ -59,7 +59,7 @@ if __name__ == "__main__":
                 continue
             logger.info(f'Starting processing image "{image}"')
 
-            content = client.download(id)
+            content = client.download(image)
             model = model_manager.load_model()
 
             img = cv2.imdecode(np.frombuffer(content, np.uint8), cv2.IMREAD_COLOR)

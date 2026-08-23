@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-import tqdm
 from PIL import Image
 
 from TorchDeepDanbooru.deep_danbooru_model import DeepDanbooruModel
@@ -30,8 +29,6 @@ class DeepDanbooru:
         with torch.no_grad(), torch.autocast("cuda"):
             x = torch.from_numpy(img).cuda()
             y = model(x)[0].detach().cpu().numpy()
-            for n in tqdm.tqdm(range(10)):
-                model(x)
 
         rating_dict = {}
         probability_dict = {}

@@ -73,12 +73,9 @@ class NextCloud:
 
         return [*images[1:], *children]
 
-    def download(self, id):
-        response = self.session.request(
-            "GET",
-            f"{self.url}/core/preview",
-            params={"fileId": id, "a": "true", "x": 3840, "y": 2160},
-        )
+    def download(self, href):
+        response = self.session.request("GET", f"{self.url}{href}")
+        response.raise_for_status()
         return response.content
 
     def get_tags(self):

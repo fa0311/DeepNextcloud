@@ -38,7 +38,7 @@ if __name__ == "__main__":
             continue
         logger.info(f'Starting processing image "{image}"')
 
-        content = client.download(id)
+        content = client.download(image)
         img = Image.open(io.BytesIO(content))
         img = DeepDanbooru.preprocess_image(img)
         model = model_manager.load_model()
