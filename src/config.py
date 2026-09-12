@@ -17,3 +17,5 @@ class Settings(BaseSettings):
     path: str = Field()
     score_threshold: float = Field(default=0.5)
     invisible_tags: str = Field(default="Tagged by deepdanbooru v1.0.0")
+    video_frame_positions: list[float] = Field(default=[0.1, 0.5, 0.9])
+    tag_assign_concurrency: int = Field(default=8)

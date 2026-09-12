@@ -1,14 +1,18 @@
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
 
 import requests
+from requests.adapters import HTTPAdapter
 
 
 class NextCloud:
-    def __init__(self, url, username, password):
+    def __init__(self, url, username, password, concurrency=8):
         self.session = requests.Session()
         self.username = username
         self.password = password
         self.session.auth = (username, password)
+        self.session.mount(url, HTTPAdapter(pool_maxsize=concurrency))
+        self.executor = ThreadPoolExecutor(max_workers=concurrency)
         self.url = url
 
     def request(self, method: str, path: str, tags: list):
@@ -96,7 +100,7 @@ class NextCloud:
         user_assignable=True,
         can_assign=True,
     ):
-        self.session.request(
+        response = self.session.request(
             "POST",
             self.url + "/remote.php/dav/systemtags/",
             json={
@@ -106,13 +110,24 @@ class NextCloud:
                 "name": name,
             },
         )
+        if not response.ok:
+            raise Exception(
+                f"Failed to create tag {name!r}: HTTP {response.status_code} {response.text[:300]}"
+            )
 
     def assign_tag(self, file_id, tag_id):
         response = self.session.request(
             "PUT",
             self.url + f"/remote.php/dav/systemtags-relations/files/{file_id}/{tag_id}",
         )
+        already_assigned = response.status_code == 409
+        if not already_assigned:
+            response.raise_for_status()
         return response.text
+
+    def assign_tags(self, file_id, tag_ids):
+        for _ in self.executor.map(lambda tag_id: self.assign_tag(file_id, tag_id), tag_ids):
+            pass
 
     def unassign_tag(self, file_id, tag_id):
         response = self.session.request(
